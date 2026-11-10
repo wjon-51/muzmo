@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MUZMO Music</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#0b0b10;color:white;
+ font-family:Arial,sans-serif;padding:25px
+}
+header{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:30px;font-weight:bold}
+.logo span{color:#b7f34a}
+.search{
+ width:100%;padding:14px;border-radius:12px;
+ background:#191923;border:1px solid #333;color:white;
+ margin:25px 0
+}
+.hero{
+ padding:35px;border-radius:20px;
+ background:linear-gradient(120deg,#28234a,#744c9d);
+ margin-bottom:30px
+}
+.hero h1{font-size:40px;margin:10px 0}
+button{
+ background:#b7f34a;color:#111;border:0;
+ padding:12px 20px;border-radius:25px;
+ font-weight:bold;cursor:pointer
+}
+h2{margin-top:30px}
+.grid{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+ gap:18px
+}
+.card{background:#191923;padding:12px;border-radius:15px}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+.card h3{font-size:15px;margin-bottom:5px}
+.card p{color:#999;font-size:12px}
+.player{
+ position:fixed;bottom:0;left:0;right:0;
+ background:#191923;padding:18px;
+ display:flex;justify-content:space-between;align-items:center;
+ border-top:1px solid #333
+}
+#status{color:#b7f34a;font-size:12px}
+@media(max-width:500px){
+ body{padding:15px;padding-bottom:100px}
+ .hero h1{font-size:32px}
+ .player{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">MUZ<span>MO</span></div>
+ <button onclick="alert('Welcome to MUZMO!')">Sign in</button>
+</header>
+
+<input class="search" id="search"
+ placeholder="Search music..." oninput="searchMusic()">
+
+<section class="hero">
+ <p>YOUR SOUND. YOUR WORLD.</p>
+ <h1>Every beat has a story.</h1>
+ <p>Discover music. Enjoy every moment.</p>
+ <button onclick="playMusic(0)">Start listening →</button>
+</section>
+
+<h2>Discover music</h2>
+<div class="grid" id="music"></div>
+
+<div class="player">
+ <div>
+  <strong id="song">Choose a song</strong>
+  <div id="status">MUZMO Player</div>
+ </div>
+ <button onclick="togglePlay()" id="play">▶ Play</button>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+const songs=[
+ {
+  name:"Midnight City",
+  artist:"M83",
+  image:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=400",
+  audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+ },
+ {
+  name:"Golden Hour",
+  artist:"JVKE",
+  image:"https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=400",
+  audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+ },
+ {
+  name:"Ocean Drive",
+  artist:"Duke Dumont",
+  image:"https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=400",
+  audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+ },
+ {
+  name:"Sunset Lover",
+  artist:"Petit Biscuit",
+  image:"https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=400",
+  audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
+ }
+];
+
+let current=0;
+let audio=document.getElementById("audio");
+
+function displaySongs(list){
+ document.getElementById("music").innerHTML=list.map(s=>`
+ <div class="card">
+  <img src="${s.image}" alt="Album cover">
+  <h3>${s.name}</h3>
+  <p>${s.artist}</p>
+  <button onclick="playMusic(${songs.indexOf(s)})">▶ Play</button>
+ </div>
+ `).join("");
+}
+
+function searchMusic(){
+ const q=document.getElementById("search").value.toLowerCase();
+ displaySongs(songs.filter(s=>
+  (s.name+" "+s.artist).toLowerCase().includes(q)
+ ));
+}
+
+function playMusic(index){
+ current=index;
+ const s=songs[current];
+ audio.src=s.audio;
+ document.getElementById("song").textContent=s.name;
+ document.getElementById("status").textContent=s.artist;
+ audio.play();
+ document.getElementById("play").textContent="Ⅱ Pause";
+}
+
+function togglePlay(){
+ if(audio.paused){
+  if(!audio.src) return playMusic(0);
+  audio.play();
+  document.getElementById("play").textContent="Ⅱ Pause";
+ }else{
+  audio.pause();
+  document.getElementById("play").textContent="▶ Play";
+ }
+}
+
+audio.onended=()=>{
+ playMusic((current+1)%songs.length);
+};
+
+displaySongs(songs);
+</script>
+</body>
+</html>
+
