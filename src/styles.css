@@ -1,643 +1,723 @@
-import { NavLink, Link, Route, Routes, useParams, useNavigate } from 'react-router-dom';
-
-export const tracks = [
-  {
-    id: 'midnight-city',
-    title: 'Midnight City',
-    artist: 'M83',
-    mood: 'Dreamy',
-    duration: '3:48',
-    album: 'Hurry Up, We’re Dreaming',
-    color: '#f4d58d',
-    cover:
-      'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-  },
-  {
-    id: 'golden-hour',
-    title: 'Golden Hour',
-    artist: 'JVKE',
-    mood: 'Feel good',
-    duration: '2:59',
-    album: 'Golden Hour',
-    color: '#f5b96d',
-    cover:
-      'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-  },
-  {
-    id: 'ocean-drive',
-    title: 'Ocean Drive',
-    artist: 'Duke Dumont',
-    mood: 'Chill',
-    duration: '4:02',
-    album: 'Ocean Drive',
-    color: '#7bdff2',
-    cover:
-      'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-  },
-  {
-    id: 'sunset-lover',
-    title: 'Sunset Lover',
-    artist: 'Petit Biscuit',
-    mood: 'Dreamy',
-    duration: '3:14',
-    album: 'Sunset Lover',
-    color: '#f7a196',
-    cover:
-      'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-  },
-  {
-    id: 'weightless',
-    title: 'Weightless',
-    artist: 'Marconi Union',
-    mood: 'Focus',
-    duration: '9:07',
-    album: 'Weightless',
-    color: '#8ae3bf',
-    cover:
-      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-  },
-  {
-    id: 'a-walk',
-    title: 'A Walk',
-    artist: 'Tycho',
-    mood: 'Chill',
-    duration: '3:27',
-    album: 'Awake',
-    color: '#b9d1ff',
-    cover:
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-  },
-  {
-    id: 'sunset-dreams',
-    title: 'Sunset Dreams',
-    artist: 'Sundream',
-    mood: 'Feel good',
-    duration: '3:42',
-    album: 'Sunset Dreams',
-    color: '#f7d29e',
-    cover:
-      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-  },
-  {
-    id: 'night-owl',
-    title: 'Night Owl',
-    artist: 'Galimatias',
-    mood: 'Focus',
-    duration: '4:18',
-    album: 'Night Owl',
-    color: '#d0c4ff',
-    cover:
-      'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80',
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
-  },
-];
-
-const playlists = [
-  { id: 'afterglow', name: 'Afterglow', type: 'Trending', description: 'Warm synths and smooth vocals for golden-hour evenings.' },
-  { id: 'night-drive', name: 'Night Drive', type: 'Late night', description: 'Shadowy grooves and deep atmospheres for the after-hours. ' },
-  { id: 'clean-flow', name: 'Clean Flow', type: 'Focus', description: 'Minimal textures and airy rhythm for deep work and creative momentum.' },
-];
-
-function App() {
-  const [likedIds, setLikedIds] = useState(() => {
-    const raw = window.localStorage.getItem('muzmo-liked');
-    return raw ? JSON.parse(raw) : [];
-  });
-  const [currentTrackId, setCurrentTrackId] = useState(tracks[0].id);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [search, setSearch] = useState('');
-  const [mood, setMood] = useState('All');
-
-  useEffect(() => {
-    window.localStorage.setItem('muzmo-liked', JSON.stringify(likedIds));
-  }, [likedIds]);
-
-  const currentTrack = tracks.find((track) => track.id === currentTrackId) ?? tracks[0];
-  const likedTracks = tracks.filter((track) => likedIds.includes(track.id));
-
-  const toggleLike = (trackId) => {
-    setLikedIds((current) =>
-      current.includes(trackId)
-        ? current.filter((id) => id !== trackId)
-        : [...current, trackId],
-    );
-  };
-
-  const visibleTracks = tracks.filter((track) => {
-    const matchesMood = mood === 'All' || track.mood === mood;
-    const matchesSearch = `${track.title} ${track.artist} ${track.mood}`
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return matchesMood && matchesSearch;
-  });
-
-  const handleSelectTrack = (trackId) => {
-    setCurrentTrackId(trackId);
-    setIsPlaying(true);
-  };
-
-  const nextTrack = () => {
-    const idx = tracks.findIndex((track) => track.id === currentTrackId);
-    const next = tracks[(idx + 1) % tracks.length];
-    handleSelectTrack(next.id);
-  };
-
-  const previousTrack = () => {
-    const idx = tracks.findIndex((track) => track.id === currentTrackId);
-    const previous = tracks[(idx - 1 + tracks.length) % tracks.length];
-    handleSelectTrack(previous.id);
-  };
-
-  const pageNav = [
-    { to: '/', label: 'Home', icon: 'house' },
-    { to: '/playlists', label: 'Playlists', icon: 'playlist' },
-    { to: '/library', label: 'Library', icon: 'library' },
-    { to: '/artists', label: 'Artists', icon: 'artists' },
-  ];
-
-  return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand-wrap">
-          <div className="brand-mark">♪</div>
-          <div className="brand-text">
-            MUZ<span>MO</span>
-          </div>
-        </div>
-
-        <nav className="nav" aria-label="Sidebar navigation">
-          <div className="nav-group">
-            <div className="nav-label">Menu</div>
-            {pageNav.map(({ to, label, icon }) => (
-              <NavLink key={to} to={to} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                <NavIcon name={icon} />
-                {label}
-              </NavLink>
-            ))}
-          </div>
-        </nav>
-
-        <div className="side-card">
-          <strong>Fresh picks</strong>
-          <p>Luxury soundtracks for work, late-night drives, and slow mornings.</p>
-          <Link to="/" className="mini-button">Explore picks →</Link>
-        </div>
-      </aside>
-
-      <main className="main-panel">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <DashboardPage
-                search={search}
-                setSearch={setSearch}
-                mood={mood}
-                setMood={setMood}
-                tracks={visibleTracks}
-                onSelectTrack={handleSelectTrack}
-                currentTrack={currentTrack}
-                likedIds={likedIds}
-                toggleLike={toggleLike}
-              />
-            }
-          />
-          <Route
-            path="/album/:trackId"
-            element={<AlbumPage tracks={tracks} likedIds={likedIds} toggleLike={toggleLike} onSelectTrack={handleSelectTrack} />}
-          />
-          <Route
-            path="/playlists"
-            element={<PlaylistsPage tracks={tracks} onSelectTrack={handleSelectTrack} />}
-          />
-          <Route
-            path="/library"
-            element={<LibraryPage tracks={tracks} likedTracks={likedTracks} likedIds={likedIds} toggleLike={toggleLike} onSelectTrack={handleSelectTrack} />}
-          />
-          <Route
-            path="/artists"
-            element={<ArtistsPage tracks={tracks} onSelectTrack={handleSelectTrack} />}
-          />
-        </Routes>
-      </main>
-
-      <footer className="player-bar" aria-label="Music player">
-        <div className="player-track">
-          <img className="player-cover" src={currentTrack.cover} alt={currentTrack.title} />
-          <div className="now-copy">
-            <strong>{currentTrack.title}</strong>
-            <span>{currentTrack.artist}</span>
-          </div>
-        </div>
-
-        <div className="player-controls">
-          <div className="controls-row">
-            <button type="button" className="icon-button" aria-label="Shuffle">
-              <NavIcon name="shuffle" />
-            </button>
-            <button type="button" className="icon-button" aria-label="Previous" onClick={previousTrack}>
-              <NavIcon name="previous" />
-            </button>
-            <button type="button" className="play-main" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={() => setIsPlaying((value) => !value)}>
-              <NavIcon name={isPlaying ? 'pause' : 'play'} />
-            </button>
-            <button type="button" className="icon-button" aria-label="Next" onClick={nextTrack}>
-              <NavIcon name="next" />
-            </button>
-            <button type="button" className="icon-button" aria-label="Repeat">
-              <NavIcon name="repeat" />
-            </button>
-          </div>
-          <div className="timeline">
-            <span>1:12</span>
-            <input type="range" value="42" readOnly />
-            <span>{currentTrack.duration}</span>
-          </div>
-        </div>
-
-        <div className="player-tools">
-          <button type="button" className="icon-button" aria-label="Like track" onClick={() => toggleLike(currentTrack.id)}>
-            <NavIcon name={likedIds.includes(currentTrack.id) ? 'liked' : 'like'} />
-          </button>
-          <button type="button" className="icon-button" aria-label="Volume">
-            <NavIcon name="volume" />
-          </button>
-          <input type="range" value="75" readOnly />
-        </div>
-      </footer>
-    </div>
-  );
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
-function DashboardPage({ search, setSearch, mood, setMood, tracks, onSelectTrack, currentTrack, likedIds, toggleLike }) {
-  const moods = ['All', 'Chill', 'Dreamy', 'Feel good', 'Focus'];
-
-  return (
-    <>
-      <header className="topbar">
-        <label className="searchbar" aria-label="Search tracks and artists">
-          <NavIcon name="search" />
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            type="search"
-            placeholder="Search tracks, artists, moods"
-          />
-          <span className="shortcut">⌘K</span>
-        </label>
-
-        <div className="top-actions">
-          <button type="button" className="ghost-button">Upgrade</button>
-          <div className="profile-pill">
-            <div className="profile-avatar">M</div>
-            <div className="profile-copy">
-              <strong>Music lover</strong>
-              <span>Good to see you</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <section className="hero-panel">
-        <div className="hero-content">
-          <span className="eyebrow">A new sound for every day</span>
-          <h1>Find your kind of rhythm.</h1>
-          <p>Curated playlists, immersive listening, and all the songs that make your day feel premium.</p>
-          <div className="hero-actions">
-            <button type="button" className="primary-button" onClick={() => onSelectTrack(tracks[0]?.id ?? currentTrack.id)}>
-              Start listening
-            </button>
-            <button type="button" className="secondary-button" onClick={() => onSelectTrack(tracks[1]?.id ?? currentTrack.id)}>
-              Play mix
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="content-section" id="discover">
-        <div className="section-head">
-          <div>
-            <h2>Made for your mood</h2>
-            <small>Fresh tracks selected for the moment</small>
-          </div>
-          <button type="button" className="section-link" onClick={() => { setMood('All'); setSearch(''); }}>
-            See all
-          </button>
-        </div>
-
-        <div className="filter-row" aria-label="Mood filters">
-          {moods.map((chip) => (
-            <button
-              type="button"
-              key={chip}
-              className={`filter-chip ${mood === chip ? 'active' : ''}`}
-              onClick={() => setMood(chip)}
-            >
-              {chip}
-            </button>
-          ))}
-        </div>
-
-        <div className="track-grid">
-          {tracks.length ? (
-            tracks.map((track) => (
-              <article key={track.id} className="track-card">
-                <div className="cover-wrap">
-                  <img src={track.cover} alt={`${track.title} cover`} />
-                  <button type="button" className="play-badge" aria-label={`Play ${track.title}`} onClick={() => onSelectTrack(track.id)}>
-                    <NavIcon name="play" />
-                  </button>
-                </div>
-                <div className="card-copy">
-                  <div className="card-meta-row">
-                    <h3>{track.title}</h3>
-                    <button type="button" className="tiny-icon" onClick={() => toggleLike(track.id)} aria-label={`Like ${track.title}`}>
-                      <NavIcon name={likedIds.includes(track.id) ? 'liked' : 'like'} />
-                    </button>
-                  </div>
-                  <p>
-                    {track.artist} · {track.mood}
-                  </p>
-                  <Link to={`/album/${track.id}`} className="album-link">Open album</Link>
-                </div>
-              </article>
-            ))
-          ) : (
-            <div className="empty-note">No tracks match this search yet.</div>
-          )}
-        </div>
-      </section>
-
-      <section className="content-section">
-        <div className="section-head">
-          <div>
-            <h2>Curated playlists</h2>
-            <small>Soundtracks for every moment</small>
-          </div>
-        </div>
-
-        <div className="playlist-grid">
-          {playlists.map((playlist, index) => (
-            <article key={playlist.id} className={`playlist-card playlist-${index + 1}`}>
-              <div className="playlist-tag">{playlist.type}</div>
-              <h3>{playlist.name}</h3>
-              <p>{playlist.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="content-section">
-        <div className="section-head">
-          <div>
-            <h2>Featured artists</h2>
-            <small>New discoveries</small>
-          </div>
-        </div>
-
-        <div className="feature-grid">
-          <div className="spotlight-card">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80" alt="Featured artist portrait" />
-            <div>
-              <span className="eyebrow">Artist spotlight</span>
-              <h3>Omar Vale</h3>
-              <p>Warm textures, layered hooks, and a sound that feels like a quiet neon dusk.</p>
-              <button type="button" className="primary-button" onClick={() => onSelectTrack('sunset-lover')}>
-                Play artist mix
-              </button>
-            </div>
-          </div>
-
-          <div className="artist-list">
-            {[
-              { name: 'Ari Sol', detail: 'Night pop · 32 tracks', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80' },
-              { name: 'Noah Reed', detail: 'Lo-fi soul · 28 tracks', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80' },
-              { name: 'Lina Rue', detail: 'Dreamwave · 21 tracks', image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80' },
-            ].map((artist) => (
-              <article key={artist.name} className="artist-item">
-                <img src={artist.image} alt={artist.name} />
-                <div>
-                  <strong>{artist.name}</strong>
-                  <span>{artist.detail}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
-  );
+:root {
+  --bg: #090b10;
+  --bg-soft: #121722;
+  --panel: rgba(21, 25, 35, 0.9);
+  --panel-strong: rgba(14, 18, 26, 0.95);
+  --panel-alt: rgba(255, 255, 255, 0.03);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(196, 245, 107, 0.24);
+  --text: #edf2f7;
+  --muted: #98a4b5;
+  --muted-strong: #dbe4ef;
+  --lime: #c9f16a;
+  --lime-soft: #dff8ad;
+  --shadow: rgba(0, 0, 0, 0.35);
 }
 
-function AlbumPage({ tracks, likedIds, toggleLike, onSelectTrack }) {
-  const { trackId } = useParams();
-  const track = tracks.find((item) => item.id === trackId) ?? tracks[0];
-  const relatedTracks = tracks.filter((item) => item.id !== track.id).slice(0, 4);
+* { box-sizing: border-box; }
 
-  return (
-    <section className="album-page">
-      <div className="album-hero">
-        <img src={track.cover} alt={track.title} className="album-cover" />
-        <div className="album-copy">
-          <span className="eyebrow">Album</span>
-          <h1>{track.title}</h1>
-          <p>{track.artist}</p>
-          <div className="album-meta">
-            <span>{track.album}</span>
-            <span>{track.mood}</span>
-            <span>{track.duration}</span>
-          </div>
-          <div className="album-actions">
-            <button type="button" className="primary-button" onClick={() => onSelectTrack(track.id)}>Play album</button>
-            <button type="button" className="secondary-button" onClick={() => toggleLike(track.id)}>
-              {likedIds.includes(track.id) ? 'Saved' : 'Save to library'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="track-list">
-        {tracks.map((item, index) => (
-          <button key={item.id} type="button" className="track-row" onClick={() => onSelectTrack(item.id)}>
-            <span className="track-index">{String(index + 1).padStart(2, '0')}</span>
-            <div className="track-row-main">
-              <strong>{item.title}</strong>
-              <small>{item.artist}</small>
-            </div>
-            <span className="track-row-mood">{item.mood}</span>
-            <span className="track-row-time">{item.duration}</span>
-            <span className="track-row-like">{likedIds.includes(item.id) ? '♥' : '♡'}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="related-wrap">
-        <div className="section-head compact">
-          <div>
-            <h2>More from the collection</h2>
-            <small>You might also like</small>
-          </div>
-        </div>
-        <div className="related-grid">
-          {relatedTracks.map((item) => (
-            <Link key={item.id} to={`/album/${item.id}`} className="related-card">
-              <img src={item.cover} alt={item.title} />
-              <strong>{item.title}</strong>
-              <span>{item.artist}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, rgba(201, 241, 106, 0.12), transparent 32%), linear-gradient(180deg, #05070a 0%, #0b1016 100%);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
 }
 
-function PlaylistsPage({ tracks, onSelectTrack }) {
-  return (
-    <section className="page-shell">
-      <header className="page-header">
-        <span className="eyebrow">Curated</span>
-        <h1>Playlist collection</h1>
-        <p>Choose the mood, the pace, and the soundtrack for your next moment.</p>
-      </header>
+img { display: block; max-width: 100%; }
 
-      <div className="playlist-hero">
-        <div className="hero-card hero-card-highlight">
-          <span className="eyebrow">Featured drop</span>
-          <h2>Afterglow</h2>
-          <p>Warm synths, easy grooves, and mellow vocals for the kind of evening that stretches just a bit longer.</p>
-          <button type="button" className="primary-button" onClick={() => onSelectTrack(tracks[0].id)}>Play playlist</button>
-        </div>
-        <div className="hero-card hero-card-alt">
-          <span className="eyebrow">For your focus</span>
-          <h2>Clean Flow</h2>
-          <p>Low-key beats and layered textures for productive afternoons and quiet momentum.</p>
-          <button type="button" className="secondary-button" onClick={() => onSelectTrack(tracks[4].id)}>Start focus mix</button>
-        </div>
-      </div>
+a { color: inherit; text-decoration: none; }
 
-      <div className="playlist-layout">
-        {playlists.map((playlist) => (
-          <article key={playlist.id} className="mini-playlist">
-            <div className="playlist-tag">{playlist.type}</div>
-            <h3>{playlist.name}</h3>
-            <p>{playlist.description}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
+button,
+input { font: inherit; }
+
+button { cursor: pointer; }
+
+#root { min-height: 100vh; }
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
 }
 
-function LibraryPage({ tracks, likedTracks, likedIds, toggleLike, onSelectTrack }) {
-  return (
-    <section className="page-shell">
-      <header className="page-header">
-        <span className="eyebrow">Your collection</span>
-        <h1>Library</h1>
-        <p>Saved songs, favorite playlists, and every sound that keeps finding its way back.</p>
-      </header>
-
-      <section className="liked-section">
-        <div className="section-head compact">
-          <div>
-            <h2>Liked songs</h2>
-            <small>{likedTracks.length} favorite tracks</small>
-          </div>
-        </div>
-
-        <div className="library-grid">
-          {likedTracks.length ? (
-            likedTracks.map((track) => (
-              <article key={track.id} className="library-card">
-                <img src={track.cover} alt={`${track.title} cover`} />
-                <div className="library-copy">
-                  <strong>{track.title}</strong>
-                  <span>{track.artist}</span>
-                </div>
-                <div className="library-actions">
-                  <button type="button" className="tiny-action" onClick={() => onSelectTrack(track.id)}>Play</button>
-                  <button type="button" className="tiny-action alt" onClick={() => toggleLike(track.id)}>Remove</button>
-                </div>
-              </article>
-            ))
-          ) : (
-            <div className="empty-note library-empty">No liked songs yet. Tap the heart on any track to save it here.</div>
-          )}
-        </div>
-      </section>
-    </section>
-  );
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 22px 18px 26px;
+  background: rgba(8, 11, 16, 0.94);
+  border-right: 1px solid var(--line);
+  backdrop-filter: blur(22px);
 }
 
-function ArtistsPage({ onSelectTrack }) {
-  const spotlight = {
-    name: 'Omar Vale',
-    description: 'Omar blends soft synth detail, cinematic feeling, and intimate lyrics into a sound that moves from dusty afternoon to electric midnight.',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80',
-  };
-
-  return (
-    <section className="page-shell">
-      <header className="page-header">
-        <span className="eyebrow">Discover</span>
-        <h1>Featured artists</h1>
-        <p>Fresh voices, deep textures, and the sounds you want to keep close.</p>
-      </header>
-
-      <section className="artist-spotlight">
-        <img src={spotlight.image} alt={spotlight.name} />
-        <div>
-          <span className="eyebrow">Artist spotlight</span>
-          <h2>{spotlight.name}</h2>
-          <p>{spotlight.description}</p>
-          <button type="button" className="primary-button" onClick={() => onSelectTrack('sunset-lover')}>Play his mix</button>
-        </div>
-      </section>
-
-      <div className="artist-grid">
-        {[
-          { name: 'Ari Sol', detail: 'Night pop · 32 tracks', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=80' },
-          { name: 'Noah Reed', detail: 'Lo-fi soul · 28 tracks', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80' },
-          { name: 'Lina Rue', detail: 'Dreamwave · 21 tracks', image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=500&q=80' },
-        ].map((artist) => (
-          <article key={artist.name} className="artist-card">
-            <img src={artist.image} alt={artist.name} />
-            <h3>{artist.name}</h3>
-            <p>{artist.detail}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 22px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -1.2px;
 }
 
-function NavIcon({ name }) {
-  const icons = {
-    house: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9.5Z" /></svg>,
-    playlist: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0-10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm16-2v11a3 3 0 1 1-3-3h10" /></svg>,
-    library: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 18V6m12 12V8M12 18V4" /></svg>,
-    artists: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M16 19v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8 8v-1a4 4 0 0 0-3-3l-1 2" /></svg>,
-    search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 5 5" /></svg>,
-    play: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>,
-    pause: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zm8 0h4v14h-4z" /></svg>,
-    previous: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zm12 1v12l-9-6zm-2 6 7 4.5V6.5z" /></svg>,
-    next: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zm-12 1v12l9-6zm2 6 7 4.5V6.5z" /></svg>,
-    repeat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m17 2 4 4-4 4M7 22l-4-4 4-4M21 6H9a6 6 0 0 0-6 6m0 12h15a6 6 0 0 0 6-6" /></svg>,
-    shuffle: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m17 3 4 4-4 4M3 7h4l5 6h9M3 17h4l5-6h9" /></svg>,
-    like: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z" /></svg>,
-    liked: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z" /></svg>,
-    volume: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M11 5 6 9H3v6h3l5 4V5Zm7 4a5 5 0 0 1 0 6M16 7a9 9 0 0 1 0 10" /></svg>,
-  };
-
-  return <span className="nav-icon">{icons[name] || icons.house}</span>;
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e4ffb3, #b9ed67);
+  color: #12180d;
+  font-size: 17px;
 }
 
-export default App;
+.brand-text span { color: var(--lime); }
+
+.nav { display: grid; gap: 18px; }
+.nav-group { display: grid; gap: 6px; }
+
+.nav-label {
+  margin: 8px 10px 8px;
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #7f8b9a;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 11px 12px;
+  color: #b3bdc9;
+  transition: 0.2s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+  color: white;
+}
+
+.nav-icon {
+  width: 17px;
+  height: 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon svg, .nav-item svg { width: 17px; height: 17px; }
+
+.side-card {
+  margin-top: 26px;
+  padding: 16px 15px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.014));
+}
+
+.side-card strong { display: block; margin-bottom: 8px; font-size: 12px; }
+.side-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.mini-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-radius: 10px;
+  background: rgba(201, 241, 106, 0.12);
+  border: 1px solid rgba(201, 241, 106, 0.18);
+  color: var(--lime-soft);
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.main-panel { padding: 22px 24px 120px; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.searchbar {
+  position: relative;
+  display: block;
+  width: min(500px, 62vw);
+}
+
+.searchbar svg {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #8c96a4;
+}
+
+.searchbar input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  padding: 0 50px 0 42px;
+  outline: none;
+}
+
+.searchbar input:focus { border-color: rgba(201, 241, 106, 0.5); }
+
+.shortcut {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.018);
+  color: #8c96a4;
+  padding: 4px 6px;
+  font-size: 10px;
+}
+
+.top-actions { display: flex; align-items: center; gap: 14px; }
+
+.ghost-button {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: #edf3ff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.profile-pill { display: flex; align-items: center; gap: 10px; }
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dffca3, #bce96f);
+  color: #10150a;
+  font-weight: 800;
+}
+
+.profile-copy { display: flex; flex-direction: column; line-height: 1.1; }
+.profile-copy strong { font-size: 12px; }
+.profile-copy span { font-size: 10px; color: var(--muted); }
+
+.hero-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 310px;
+  overflow: hidden;
+  padding: clamp(26px, 5vw, 56px);
+  border: 1px solid rgba(201, 241, 106, 0.12);
+  border-radius: 28px;
+  background: linear-gradient(120deg, rgba(14, 18, 26, 0.88), rgba(19, 22, 30, 0.7));
+  box-shadow: 0 28px 55px rgba(0, 0, 0, 0.28);
+}
+
+.hero-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(7, 8, 10, 0.9), rgba(7, 8, 10, 0.14)), url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+}
+
+.hero-panel::after {
+  content: '';
+  position: absolute;
+  right: -7%;
+  top: -18%;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: rgba(201, 241, 106, 0.08);
+  border: 1px solid rgba(201, 241, 106, 0.2);
+  box-shadow: 0 0 0 32px rgba(201, 241, 106, 0.04), 0 0 0 68px rgba(201, 241, 106, 0.02);
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 560px; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--lime-soft);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--lime-soft); }
+
+.hero-content h1 {
+  margin: 16px 0 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -3px;
+  font-size: clamp(40px, 5vw, 64px);
+}
+
+.hero-content p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 480px;
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+
+.primary-button,
+.secondary-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 19px;
+  font-weight: 800;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #c8f46c, #d9fca9);
+  color: #11160d;
+  box-shadow: 0 18px 32px rgba(201, 241, 106, 0.2);
+}
+
+.secondary-button {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: #edf3ff;
+}
+
+.content-section { margin-top: 30px; }
+.section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+.section-head.compact { margin-bottom: 16px; }
+.section-head h2 { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(24px, 2vw, 30px); letter-spacing: -0.7px; }
+.section-head small { color: var(--muted); font-size: 12px; }
+.section-link { border: 0; background: transparent; color: var(--lime-soft); font-size: 12px; font-weight: 700; padding: 0; }
+
+.filter-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.filter-chip {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  color: #afbac7;
+  padding: 9px 14px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.filter-chip.active {
+  background: var(--lime);
+  border-color: transparent;
+  color: #181d12;
+}
+
+.track-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.track-card {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.track-card:hover { transform: translateY(-3px); border-color: rgba(201, 241, 106, 0.2); }
+
+.cover-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  aspect-ratio: 1;
+  background: #1c232d;
+}
+.cover-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+.play-badge {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(201, 241, 106, 0.96);
+  color: #10160c;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.22);
+}
+
+.play-badge svg, .icon-button svg { width: 15px; height: 15px; }
+.card-copy { padding: 12px 3px 4px; }
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.card-copy h3 { margin: 0; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-copy p { margin: 6px 0 10px; color: var(--muted); font-size: 11px; }
+.album-link { color: var(--lime-soft); font-size: 12px; font-weight: 700; }
+
+.tiny-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+  background: transparent;
+  color: #c9d1db;
+}
+
+.playlist-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.playlist-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  min-height: 180px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+}
+.playlist-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 8, 11, 0.12), rgba(8, 8, 11, 0.76));
+}
+.playlist-card > * { position: relative; z-index: 1; }
+.playlist-card h3 { margin: 0 0 8px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(24px, 2vw, 32px); letter-spacing: -1px; }
+.playlist-card p { margin: 0; font-size: 12px; color: rgba(255,255,255,0.82); }
+.playlist-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--lime-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.playlist-tag::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--lime-soft); }
+.playlist-1 { background: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=900&q=80') center/cover no-repeat; }
+.playlist-2 { background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80') center/cover no-repeat; }
+.playlist-3 { background: url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80') center/cover no-repeat; }
+
+.feature-grid { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 18px; }
+.spotlight-card {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.spotlight-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 18px; }
+.spotlight-card h3 { margin: 12px 0 10px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(24px, 2vw, 30px); letter-spacing: -1px; }
+.spotlight-card p { margin: 0 0 18px; color: var(--muted); line-height: 1.7; font-size: 13px; }
+
+.artist-list { display: grid; gap: 12px; }
+.artist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.artist-item img { width: 52px; height: 52px; object-fit: cover; border-radius: 14px; }
+.artist-item div { display: flex; flex-direction: column; gap: 2px; }
+.artist-item strong { font-size: 13px; }
+.artist-item span { color: var(--muted); font-size: 11px; }
+
+.player-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(220px, 1.8fr) minmax(180px, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 12px 22px;
+  background: rgba(11, 15, 20, 0.9);
+  backdrop-filter: blur(18px);
+  border-top: 1px solid var(--line);
+}
+
+.player-track, .player-tools, .controls-row, .timeline { display: flex; align-items: center; }
+.player-track { gap: 12px; min-width: 0; }
+.player-cover { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
+.now-copy { display: flex; flex-direction: column; min-width: 0; }
+.now-copy strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.now-copy span { color: var(--muted); font-size: 11px; }
+
+.player-controls { display: flex; flex-direction: column; align-items: center; }
+.controls-row { gap: 16px; margin-bottom: 8px; }
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: #a9b2bf;
+  padding: 0;
+}
+.play-main {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: #edf7ff;
+  color: #111719;
+}
+.timeline {
+  width: min(100%, 520px);
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.timeline input[type='range'], .player-tools input[type='range'] { accent-color: var(--lime); }
+.timeline input[type='range'] { width: 100%; }
+.player-tools { justify-content: flex-end; gap: 12px; }
+.player-tools input[type='range'] { width: 100px; }
+
+.empty-note {
+  grid-column: 1 / -1;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 30px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.album-page, .page-shell { display: grid; gap: 24px; }
+.page-header {
+  margin: 8px 0 0;
+  padding: 22px 20px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.page-header h1 {
+  margin: 8px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(30px, 4vw, 46px);
+  letter-spacing: -2px;
+}
+.page-header p { margin: 0; color: var(--muted); }
+
+.album-hero {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.album-cover { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 22px; }
+.album-copy { display: flex; flex-direction: column; justify-content: center; }
+.album-copy h1 { margin: 12px 0 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(34px, 4vw, 56px); letter-spacing: -2px; }
+.album-copy p { margin: 8px 0 16px; color: var(--muted-strong); font-size: 18px; }
+.album-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.album-meta span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  padding: 7px 11px;
+  font-size: 11px;
+}
+.album-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.track-list { display: grid; gap: 10px; }
+.track-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1.5fr) 100px 60px 30px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  padding: 16px 14px;
+  text-align: left;
+}
+.track-index, .track-row-time, .track-row-like, .track-row-mood { color: var(--muted); font-size: 12px; }
+.track-row-main { display: flex; flex-direction: column; min-width: 0; }
+.track-row-main strong { font-size: 14px; }
+.track-row-main small { color: var(--muted); font-size: 11px; }
+
+.related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.related-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+.related-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; }
+.related-card strong { font-size: 13px; }
+.related-card span { color: var(--muted); font-size: 11px; }
+
+.playlist-hero { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; }
+.hero-card {
+  min-height: 200px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: linear-gradient(120deg, rgba(201, 241, 106, 0.12), rgba(255, 255, 255, 0.02));
+}
+.hero-card h2 { margin: 0 0 12px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(26px, 3vw, 38px); letter-spacing: -1px; }
+.hero-card p { margin: 0 0 16px; color: #d0d9e2; line-height: 1.7; }
+.hero-card-alt { background: linear-gradient(120deg, rgba(56, 86, 122, 0.28), rgba(255, 255, 255, 0.02)); }
+.playlist-layout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.mini-playlist {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.mini-playlist h3 { margin: 0 0 8px; font-size: 18px; }
+.mini-playlist p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 12px; }
+
+.artist-spotlight {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.artist-spotlight img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 22px; }
+.artist-spotlight h2 { margin: 12px 0 10px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(26px, 3vw, 40px); letter-spacing: -1px; }
+.artist-spotlight p { margin: 0 0 18px; color: #aab4bf; line-height: 1.8; }
+.artist-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.artist-card {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.artist-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; }
+.artist-card h3 { margin: 14px 0 4px; font-size: 16px; }
+.artist-card p { margin: 0; color: var(--muted); font-size: 12px; }
+
+.liked-section { display: grid; gap: 12px; }
+.library-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.library-card {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.library-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; }
+.library-copy { display: flex; flex-direction: column; gap: 4px; }
+.library-copy strong { font-size: 14px; }
+.library-copy span { color: var(--muted); font-size: 11px; }
+.library-actions { display: flex; gap: 8px; }
+.tiny-action {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: 11px;
+}
+.tiny-action.alt { color: var(--lime-soft); }
+.library-empty { grid-column: 1 / -1; }
+
+@media (max-width: 1100px) {
+  .track-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .playlist-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .feature-grid { grid-template-columns: 1fr; }
+  .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main-panel { padding-top: 16px; }
+  .topbar { flex-wrap: wrap; }
+  .searchbar { width: 100%; }
+  .track-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .player-bar { grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.35fr) minmax(120px, 0.8fr); }
+  .album-hero { grid-template-columns: 1fr; }
+  .playlist-hero, .playlist-layout, .artist-grid { grid-template-columns: 1fr; }
+  .artist-spotlight { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .main-panel { padding: 12px 14px 120px; }
+  .ghost-button { display: none; }
+  .track-grid { grid-template-columns: 1fr; }
+  .playlist-grid { grid-template-columns: 1fr; }
+  .related-grid { grid-template-columns: 1fr; }
+  .player-bar { grid-template-columns: 1fr auto; padding: 10px 12px; }
+  .player-controls { grid-column: 1 / -1; }
+  .player-tools { display: none; }
+  .timeline span { display: none; }
+  .timeline { width: 100%; }
+  .hero-content h1 { letter-spacing: -2.2px; }
+  .spotlight-card { grid-template-columns: 1fr; }
+  .library-grid { grid-template-columns: 1fr; }
+  .track-row { grid-template-columns: 32px minmax(0, 1fr) 70px 50px 20px; }
+  .track-row-mood { display: none; }
+  .album-meta { gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto; transition: none !important; }
+}
