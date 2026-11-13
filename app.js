@@ -135,6 +135,7 @@ function setAuthMode(mode) {
   const submit = document.getElementById('auth-submit');
   const nameField = document.getElementById('auth-name-field');
   const authForm = document.getElementById('auth-form');
+  const modeButtons = document.querySelectorAll('.auth-mode-btn');
   if (!modal || !title || !subtitle || !submit || !authForm) return;
 
   const isSignup = mode === 'signup';
@@ -145,6 +146,7 @@ function setAuthMode(mode) {
   submit.textContent = isSignup ? 'Create account' : 'Log in';
   if (nameField) nameField.classList.toggle('hidden', !isSignup);
   authForm.dataset.mode = mode;
+  modeButtons.forEach((button) => button.classList.toggle('active', button.dataset.authMode === mode));
 }
 
 function openAuthModal(mode = 'login') {
@@ -395,3 +397,11 @@ if (libraryGrid) {
     if (card) playTrack(Number(card.dataset.index));
   });
 }
+
+const insightRows = document.querySelectorAll('[data-insight-index]');
+insightRows.forEach((row) => {
+  row.addEventListener('click', () => {
+    const index = Number(row.dataset.insightIndex);
+    if (!Number.isNaN(index) && index >= 0 && index < tracks.length) playTrack(index);
+  });
+});
