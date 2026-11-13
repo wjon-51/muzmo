@@ -9,18 +9,20 @@ const tracks = [
   { title: "Night Owl", artist: "Galimatias", mood: "Focus", cover: "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=600&q=80", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
 ];
 
+const storageKey = "muzmo-user";
 const audio = document.getElementById('audio');
 const search = document.getElementById('search');
 const grid = document.getElementById('music-grid');
 const toast = document.getElementById('toast');
 const liked = new Set();
 let activeMood = 'All';
-let currentIndex = -1;
+let currentIndex = 0;
 let shuffleOn = false;
 let repeatOn = false;
 let toastTimer;
 
 function showToast(message) {
+  if (!toast) return;
   toast.textContent = message;
   toast.classList.add('show');
   clearTimeout(toastTimer);
@@ -126,6 +128,99 @@ function prevTrack() {
   playTrack((currentIndex - 1 + tracks.length) % tracks.length);
 }
 
+function setAuthMode(mode) {
+  const modal = document.getElementById('auth-modal');
+  const title = document.getElementById('auth-title');
+  const subtitle = document.getElementById('auth-subtitle');
+  const submit = document.getElementById('auth-submit');
+  const nameField = document.getElementById('auth-name-field');
+  const authForm = document.getElementById('auth-form');
+  if (!modal || !title || !subtitle || !submit || !authForm) return;
+
+  const isSignup = mode === 'signup';
+  title.textContent = isSignup ? 'Create your account' : 'Welcome back';
+  subtitle.textContent = isSignup
+    ? 'Start your curated listening life with MUZMO.'
+    : 'Pick up where you left off.';
+  submit.textContent = isSignup ? 'Create account' : 'Log in';
+  if (nameField) nameField.classList.toggle('hidden', !isSignup);
+  authForm.dataset.mode = mode;
+}
+
+function openAuthModal(mode = 'login') {
+  const modal = document.getElementById('auth-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  setAuthMode(mode);
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey) || 'null');
+  } catch {
+    return null;
+  }
+}
+
+function updateAuthUI() {
+  const user = getStoredUser();
+  const userPills = document.querySelectorAll('.user-pill');
+  const authButtons = document.querySelectorAll('[data-auth]');
+
+  userPills.forEach((pill) => {
+    if (user) {
+      const name = user.name || 'Music lover';
+      pill.classList.remove('hidden');
+      pill.innerHTML = `
+        <div class="profile-avatar small">${name.charAt(0).toUpperCase()}</div>
+        <div class="profile-copy">
+          <strong>${name}</strong>
+          <span>Logged in</span>
+        </div>
+      `;
+    } else {
+      pill.classList.add('hidden');
+      pill.innerHTML = '';
+    }
+  });
+
+  authButtons.forEach((button) => {
+    button.classList.toggle('hidden', !!user);
+  });
+}
+
+function handleAuthSubmit(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const mode = form.dataset.mode || 'login';
+  const nameInput = document.getElementById('auth-name');
+  const emailInput = document.getElementById('auth-email');
+  const passwordInput = document.getElementById('auth-password');
+
+  if (!emailInput || !passwordInput) return;
+
+  const payload = {
+    name: mode === 'signup' ? (nameInput?.value || 'Music lover') : (getStoredUser()?.name || 'Music lover'),
+    email: emailInput.value.trim(),
+    password: passwordInput.value.trim()
+  };
+
+  if (!payload.email || !payload.password) return;
+
+  localStorage.setItem(storageKey, JSON.stringify(payload));
+  updateAuthUI();
+  closeAuthModal();
+  showToast(mode === 'signup' ? 'Account created' : 'Logged in');
+}
+
 if (search) {
   search.addEventListener('input', renderTracks);
 }
@@ -161,6 +256,17 @@ document.addEventListener('click', (event) => {
     const target = document.getElementById(scrollTrigger.dataset.scroll);
     if (target) target.scrollIntoView({ behavior: 'smooth' });
   }
+
+  const authTrigger = event.target.closest('[data-auth]');
+  if (authTrigger) {
+    openAuthModal(authTrigger.dataset.auth);
+    return;
+  }
+
+  const closeTrigger = event.target.closest('[data-close-auth]');
+  if (closeTrigger) {
+    closeAuthModal();
+  }
 });
 
 const playButton = document.getElementById('play-button');
@@ -171,14 +277,16 @@ document.getElementById('prev-button')?.addEventListener('click', prevTrack);
 
 document.getElementById('shuffle-button')?.addEventListener('click', () => {
   shuffleOn = !shuffleOn;
-  document.getElementById('shuffle-button').style.color = shuffleOn ? '#d2f88b' : '#a9b2bf';
+  const shuffleButton = document.getElementById('shuffle-button');
+  if (shuffleButton) shuffleButton.style.color = shuffleOn ? '#d2f88b' : '#a9b2bf';
   showToast(shuffleOn ? 'Shuffle on' : 'Shuffle off');
 });
 
 document.getElementById('repeat-button')?.addEventListener('click', () => {
   repeatOn = !repeatOn;
   audio.loop = repeatOn;
-  document.getElementById('repeat-button').style.color = repeatOn ? '#d2f88b' : '#a9b2bf';
+  const repeatButton = document.getElementById('repeat-button');
+  if (repeatButton) repeatButton.style.color = repeatOn ? '#d2f88b' : '#a9b2bf';
   showToast(repeatOn ? 'Repeat on' : 'Repeat off');
 });
 
@@ -231,9 +339,59 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     togglePlayback();
   }
+  if (event.key === 'Escape') closeAuthModal();
+});
+
+const authForm = document.getElementById('auth-form');
+if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
+
+const authModeButtons = document.querySelectorAll('[data-auth-mode]');
+authModeButtons.forEach((button) => {
+  button.addEventListener('click', () => setAuthMode(button.dataset.authMode));
 });
 
 audio.volume = 0.75;
 renderTracks();
 setPlayButtonState();
-updateNowPlaying(0);
+updateNowPlaying(currentIndex);
+updateAuthUI();
+
+if (document.body.dataset.page === 'auth') {
+  const authPageForm = document.getElementById('auth-page-form');
+  if (authPageForm) {
+    authPageForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const nameInput = document.getElementById('auth-page-name');
+      const emailInput = document.getElementById('auth-page-email');
+      const passwordInput = document.getElementById('auth-page-password');
+      const mode = authPageForm.dataset.mode || 'login';
+      const payload = {
+        name: mode === 'signup' ? (nameInput?.value || 'Music lover') : (getStoredUser()?.name || 'Music lover'),
+        email: emailInput.value.trim(),
+        password: passwordInput.value.trim()
+      };
+      if (!payload.email || !payload.password) return;
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      window.location.href = 'index.html';
+    });
+  }
+}
+
+window.addEventListener('DOMContentLoaded', updateAuthUI);
+
+const libraryGrid = document.getElementById('library-grid');
+if (libraryGrid) {
+  const libraryTracks = tracks.slice(0, 8);
+  libraryGrid.innerHTML = libraryTracks.map((track, idx) => `
+    <article class="library-cell" data-index="${idx}">
+      <img src="${track.cover}" alt="${track.title} cover" />
+      <h3>${track.title}</h3>
+      <p>${track.artist}</p>
+    </article>
+  `).join('');
+
+  libraryGrid.addEventListener('click', (event) => {
+    const card = event.target.closest('[data-index]');
+    if (card) playTrack(Number(card.dataset.index));
+  });
+}

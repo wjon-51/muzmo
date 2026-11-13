@@ -1,227 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="MUZMO — premium music discovery, playlists, and artist pages." />
-  <title>MUZMO | Music for every mood</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-wrap">
-        <div class="brand-mark">♪</div>
-        <div class="brand-text">MUZ<span>MO</span></div>
-      </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="MUZMO — premium music discovery, playlists, and artist pages." />
+    <title>MUZMO | Music for every mood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-wrap">
+          <div class="brand-mark">♪</div>
+          <div class="brand-text">MUZ<span>MO</span></div>
+        </div>
 
-      <nav class="nav" aria-label="Sidebar navigation">
-        <div class="nav-group">
-          <div class="nav-label">Menu</div>
-          <a class="nav-item active" href="index.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
-            Home
-          </a>
-          <a class="nav-item" href="index.html#discover">
+        <nav class="nav" aria-label="Sidebar navigation">
+          <div class="nav-group">
+            <div class="nav-label">Menu</div>
+            <a class="nav-item active" href="index.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
+              Home
+            </a>
+            <a class="nav-item" href="index.html#discover">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
+              Discover
+            </a>
+            <a class="nav-item" href="playlists.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0-10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm16-2v11a3 3 0 1 1-3-3h10"/><path d="M20 6v11a3 3 0 0 1-3-3"/></svg>
+              Playlists
+            </a>
+            <a class="nav-item" href="library.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18V6m12 12V8M12 18V4"/></svg>
+              Library
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <div class="nav-label">More</div>
+            <a class="nav-item" href="artists.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 19v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8 8v-1a4 4 0 0 0-3-3"/><path d="M20 7.5a2.5 2.5 0 1 0 0-5"/></svg>
+              Artists
+            </a>
+            <a class="nav-item" href="library.html#liked-section">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z"/></svg>
+              Liked
+            </a>
+          </div>
+        </nav>
+
+        <div class="side-card">
+          <strong>Fresh picks</strong>
+          <p>Build a soundtrack that matches your mood, your work, and your downtime.</p>
+          <button class="mini-button" type="button" data-scroll="discover">Explore picks →</button>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <label class="searchbar" aria-label="Search tracks and artists">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
-            Discover
-          </a>
-          <a class="nav-item" href="playlists.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0-10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm16-2v11a3 3 0 1 1-3-3h10"/></svg>
-            Playlists
-          </a>
-          <a class="nav-item" href="library.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18V6m12 12V8M12 18V4"/></svg>
-            Library
-          </a>
-        </div>
+            <input id="search" type="search" placeholder="Search tracks, artists, moods" autocomplete="off" />
+            <span class="shortcut">⌘ K</span>
+          </label>
 
-        <div class="nav-group">
-          <div class="nav-label">More</div>
-          <a class="nav-item" href="artists.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 19v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8 8v-1a4 4 0 0 0-3-3.87M20 3.13a4 4 0 0 1 0 7.74"/></svg>
-            Artists
-          </a>
-          <a class="nav-item" href="library.html#liked-section">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z"/></svg>
-            Liked
-          </a>
-        </div>
-      </nav>
+          <div class="top-actions">
+            <button class="ghost-button" type="button" data-auth="login">Log in</button>
+            <button class="primary-button small" type="button" data-auth="signup">Sign up</button>
+            <div class="user-pill hidden" id="user-pill"></div>
+          </div>
+        </header>
 
-      <div class="side-card">
-        <strong>Fresh picks</strong>
-        <p>Build a soundtrack that matches your mood, your work, and your downtime.</p>
-        <button class="mini-button" type="button" data-scroll="discover">Explore picks →</button>
-      </div>
-    </aside>
-
-    <main class="main-panel">
-      <header class="topbar">
-        <label class="searchbar" aria-label="Search tracks and artists">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
-          <input id="search" type="search" placeholder="Search tracks, artists, moods" autocomplete="off" />
-          <span class="shortcut">⌘ K</span>
-        </label>
-
-        <div class="top-actions">
-          <button class="ghost-button" type="button">Upgrade</button>
-          <div class="profile-pill">
-            <div class="profile-avatar">M</div>
-            <div class="profile-copy">
-              <strong>Music lover</strong>
-              <span>Good to see you</span>
+        <section class="hero-panel">
+          <div class="hero-content">
+            <span class="eyebrow">A new sound for every day</span>
+            <h1>Find your kind of rhythm.</h1>
+            <p>Curated downloads, dreamy playlists, and all the songs that make your day brighter.</p>
+            <div class="hero-actions">
+              <button class="primary-button" type="button" data-play-index="0">Start listening</button>
+              <button class="secondary-button" type="button" data-play-index="1">Play mix</button>
             </div>
           </div>
-        </div>
-      </header>
+        </section>
 
-      <section class="hero-panel">
-        <div class="hero-content">
-          <span class="eyebrow">A new sound for every day</span>
-          <h1>Find your kind of rhythm.</h1>
-          <p>Curated downloads, dreamy playlists, and all the songs that make your day brighter.</p>
-          <div class="hero-actions">
-            <button class="primary-button" type="button" data-play-index="0">Start listening</button>
-            <button class="secondary-button" type="button" data-play-index="1">Play mix</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="content-section" id="discover">
-        <div class="section-head">
-          <div>
-            <h2>Made for your mood</h2>
-            <small>Fresh tracks selected for the moment</small>
-          </div>
-          <button class="section-link" type="button" id="clear-filters">See all</button>
-        </div>
-
-        <div class="filter-row" aria-label="Mood filters">
-          <button class="filter-chip active" type="button" data-filter="All">All sounds</button>
-          <button class="filter-chip" type="button" data-filter="Chill">Chill</button>
-          <button class="filter-chip" type="button" data-filter="Dreamy">Dreamy</button>
-          <button class="filter-chip" type="button" data-filter="Feel good">Feel good</button>
-          <button class="filter-chip" type="button" data-filter="Focus">Focus</button>
-        </div>
-
-        <div class="track-grid" id="music-grid" aria-live="polite"></div>
-      </section>
-
-      <section class="content-section">
-        <div class="section-head">
-          <div>
-            <h2>Curated playlists</h2>
-            <small>Soundtracks for every moment</small>
-          </div>
-        </div>
-
-        <div class="playlist-grid">
-          <article class="playlist-card playlist-1">
-            <div class="playlist-tag">Trending</div>
-            <h3>Afterglow</h3>
-            <p>Velvet vocals and warm synths for golden-hour moments.</p>
-          </article>
-          <article class="playlist-card playlist-2">
-            <div class="playlist-tag">Late night</div>
-            <h3>Night Drive</h3>
-            <p>Low lights, deep bass, and a little motion.</p>
-          </article>
-          <article class="playlist-card playlist-3">
-            <div class="playlist-tag">Focus</div>
-            <h3>Clean Flow</h3>
-            <p>Minimal beats and mellow textures for deep work.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="content-section">
-        <div class="section-head">
-          <div>
-            <h2>Featured artists</h2>
-            <small>New discoveries</small>
-          </div>
-        </div>
-
-        <div class="feature-grid">
-          <div class="spotlight-card">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80" alt="Featured artist portrait" />
+        <section class="content-section" id="discover">
+          <div class="section-head">
             <div>
-              <span class="eyebrow">Artist spotlight</span>
-              <h3>Omar Vale</h3>
-              <p>Warm textures, layered hooks, and a sound that feels like a quiet neon dusk.</p>
-              <button class="primary-button" type="button" data-play-index="3">Play artist mix</button>
+              <h2>Made for your mood</h2>
+              <small>Fresh tracks selected for the moment</small>
+            </div>
+            <button class="section-link" type="button" id="clear-filters">See all</button>
+          </div>
+
+          <div class="filter-row" aria-label="Mood filters">
+            <button class="filter-chip active" type="button" data-filter="All">All sounds</button>
+            <button class="filter-chip" type="button" data-filter="Chill">Chill</button>
+            <button class="filter-chip" type="button" data-filter="Dreamy">Dreamy</button>
+            <button class="filter-chip" type="button" data-filter="Feel good">Feel good</button>
+            <button class="filter-chip" type="button" data-filter="Focus">Focus</button>
+          </div>
+
+          <div class="track-grid" id="music-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="content-section">
+          <div class="section-head">
+            <div>
+              <h2>Curated playlists</h2>
+              <small>Soundtracks for every moment</small>
             </div>
           </div>
 
-          <div class="artist-list">
-            <article class="artist-item">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Ari Sol portrait" />
-              <div>
-                <strong>Ari Sol</strong>
-                <span>Night pop · 32 tracks</span>
-              </div>
+          <div class="playlist-grid">
+            <article class="playlist-card playlist-1">
+              <div class="playlist-tag">Trending</div>
+              <h3>Afterglow</h3>
+              <p>Velvet vocals and warm synths for golden-hour moments.</p>
             </article>
-            <article class="artist-item">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80" alt="Noah Reed portrait" />
-              <div>
-                <strong>Noah Reed</strong>
-                <span>Lo-fi soul · 28 tracks</span>
-              </div>
+            <article class="playlist-card playlist-2">
+              <div class="playlist-tag">Late night</div>
+              <h3>Night Drive</h3>
+              <p>Low lights, deep bass, and a little motion.</p>
             </article>
-            <article class="artist-item">
-              <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80" alt="Lina Rue portrait" />
-              <div>
-                <strong>Lina Rue</strong>
-                <span>Dreamwave · 21 tracks</span>
-              </div>
+            <article class="playlist-card playlist-3">
+              <div class="playlist-tag">Focus</div>
+              <h3>Clean Flow</h3>
+              <p>Minimal beats and mellow textures for deep work.</p>
             </article>
           </div>
+        </section>
+
+        <section class="content-section">
+          <div class="section-head">
+            <div>
+              <h2>Featured artists</h2>
+              <small>New discoveries</small>
+            </div>
+          </div>
+
+          <div class="feature-grid">
+            <div class="spotlight-card">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80" alt="Featured artist portrait" />
+              <div>
+                <span class="eyebrow">Artist spotlight</span>
+                <h3>Omar Vale</h3>
+                <p>Warm textures, layered hooks, and a sound that feels like a quiet neon dusk.</p>
+                <button class="primary-button" type="button" data-play-index="3">Play artist mix</button>
+              </div>
+            </div>
+
+            <div class="artist-list">
+              <article class="artist-item">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Ari Sol portrait" />
+                <div>
+                  <strong>Ari Sol</strong>
+                  <span>Night pop · 32 tracks</span>
+                </div>
+              </article>
+              <article class="artist-item">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80" alt="Noah Reed portrait" />
+                <div>
+                  <strong>Noah Reed</strong>
+                  <span>Lo-fi soul · 28 tracks</span>
+                </div>
+              </article>
+              <article class="artist-item">
+                <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80" alt="Lina Rue portrait" />
+                <div>
+                  <strong>Lina Rue</strong>
+                  <span>Dreamwave · 21 tracks</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="player-bar" aria-label="Music player">
+      <div class="player-track">
+        <img id="now-cover" class="player-cover" src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=250&q=80" alt="Current cover" />
+        <div class="now-copy">
+          <strong id="now-title">Choose a song</strong>
+          <span id="now-artist">MUZMO radio</span>
         </div>
-      </section>
-    </main>
-  </div>
+      </div>
 
-  <footer class="player-bar" aria-label="Music player">
-    <div class="player-track">
-      <img id="now-cover" class="player-cover" src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=250&q=80" alt="Current cover" />
-      <div class="now-copy">
-        <strong id="now-title">Choose a song</strong>
-        <span id="now-artist">MUZMO radio</span>
+      <div class="player-controls">
+        <div class="controls-row">
+          <button class="icon-button" type="button" id="shuffle-button" aria-label="Shuffle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m17 3 4 4-4 4M3 7h5.5l4 6H21M3 17h5.5l4-6H21"/></svg></button>
+          <button class="icon-button" type="button" id="prev-button" aria-label="Previous track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zm12 1v12l-9-6zm-2 6 7 4.5V6.5z"/></svg></button>
+          <button class="play-main" type="button" id="play-button" aria-label="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button class="icon-button" type="button" id="next-button" aria-label="Next track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zm-12 1v12l9-6zm2 6 7 4.5V6.5z"/></svg></button>
+          <button class="icon-button" type="button" id="repeat-button" aria-label="Repeat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m17 2 4 4-4 4M7 22l-4-4 4-4M21 6v7a4 4 0 0 1-4 4H7m-4 0v-7a4 4 0 0 1 4-4h10"/></svg></button>
+        </div>
+
+        <div class="timeline">
+          <span id="current-time">0:00</span>
+          <input id="progress" type="range" min="0" max="100" value="0" aria-label="Track progress" />
+          <span id="duration">0:00</span>
+        </div>
+      </div>
+
+      <div class="player-tools">
+        <button class="icon-button" type="button" id="like-button" aria-label="Like current track"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z"/></svg></button>
+        <button class="icon-button" type="button" aria-label="Volume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 6 9H3v6h3l5 4V5Zm7 4a5 5 0 0 1 0 6M17 7a8 8 0 0 1 0 10"/></svg></button>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.75" aria-label="Volume" />
+      </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <audio id="audio" preload="none"></audio>
+
+    <div class="auth-modal hidden" id="auth-modal" aria-hidden="true">
+      <div class="auth-modal-backdrop" data-close-auth="true"></div>
+      <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <button class="auth-close" type="button" data-close-auth="true" aria-label="Close">×</button>
+        <div class="auth-header">
+          <h2 id="auth-title">Welcome back</h2>
+          <p id="auth-subtitle">Pick up where you left off.</p>
+        </div>
+
+        <div class="auth-mode-row">
+          <button class="auth-mode-btn active" type="button" data-auth-mode="login">Log in</button>
+          <button class="auth-mode-btn" type="button" data-auth-mode="signup">Sign up</button>
+        </div>
+
+        <form id="auth-form" class="auth-form" data-mode="login">
+          <div class="auth-field hidden" id="auth-name-field">
+            <label for="auth-name">Full name</label>
+            <input id="auth-name" name="name" type="text" placeholder="Your name" />
+          </div>
+
+          <div class="auth-field">
+            <label for="auth-email">Email</label>
+            <input id="auth-email" name="email" type="email" placeholder="you@example.com" required />
+          </div>
+
+          <div class="auth-field">
+            <label for="auth-password">Password</label>
+            <input id="auth-password" name="password" type="password" placeholder="••••••••" required />
+          </div>
+
+          <button class="auth-submit" type="submit" id="auth-submit">Log in</button>
+        </form>
+
+        <div class="auth-benefits">
+          <span>Personalized recommendations</span>
+          <span>Saved liked tracks</span>
+          <span>Curated playlists for every mood</span>
+        </div>
       </div>
     </div>
 
-    <div class="player-controls">
-      <div class="controls-row">
-        <button class="icon-button" type="button" id="shuffle-button" aria-label="Shuffle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m17 3 4 4-4 4M3 17h2.5a5 5 0 0 0 4-2l4.5-6A5 5 0 0 1 18.5 7H21M3 7h3.5a5 5 0 0 1 4 2l4.5 6a5 5 0 0 0 4 2H21"/></svg></button>
-        <button class="icon-button" type="button" id="prev-button" aria-label="Previous track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zm12 1v12l-9-6zm-2 6 7 4.5V6.5z"/></svg></button>
-        <button class="play-main" type="button" id="play-button" aria-label="Play">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button class="icon-button" type="button" id="next-button" aria-label="Next track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zm-12 1v12l9-6zm2 6 7 4.5V6.5z"/></svg></button>
-        <button class="icon-button" type="button" id="repeat-button" aria-label="Repeat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m17 2 4 4-4 4M7 22l-4-4 4-4M3 6v4a3 3 0 0 0 3 3h15M21 18v-4a3 3 0 0 0-3-3H3"/></svg></button>
-      </div>
-
-      <div class="timeline">
-        <span id="current-time">0:00</span>
-        <input id="progress" type="range" min="0" max="100" value="0" aria-label="Track progress" />
-        <span id="duration">0:00</span>
-      </div>
-    </div>
-
-    <div class="player-tools">
-      <button class="icon-button" type="button" id="like-button" aria-label="Like current track"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z"/></svg></button>
-      <button class="icon-button" type="button" aria-label="Volume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 6 9H3v6h3l5 4V5Zm7 4a5 5 0 0 1 0 6M19 3a9 9 0 0 1 0 18"/></svg></button>
-      <input id="volume" type="range" min="0" max="1" step="0.01" value="0.75" aria-label="Volume" />
-    </div>
-  </footer>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <audio id="audio" preload="none"></audio>
-
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>

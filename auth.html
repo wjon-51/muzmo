@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sign in or create a MUZMO account." />
+    <title>MUZMO | Account</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-body">
+    <div class="auth-shell">
+      <div class="auth-visual">
+        <span class="eyebrow">Your soundtrack</span>
+        <h1>Feel every mood.</h1>
+        <p>Build playlists, discover new music, and keep the right vibe going from morning to midnight.</p>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-card">
+          <div class="auth-toggle">
+            <button class="active" type="button" data-auth-page-mode="login">Log in</button>
+            <button type="button" data-auth-page-mode="signup">Sign up</button>
+          </div>
+
+          <h2 id="auth-page-title">Welcome back</h2>
+          <p id="auth-page-subtitle">Continue listening to the sound of now.</p>
+
+          <form id="auth-page-form" class="auth-page-form" data-mode="login">
+            <div id="auth-page-name-wrap" class="hidden">
+              <input id="auth-page-name" type="text" placeholder="Full name" />
+            </div>
+            <input id="auth-page-email" type="email" placeholder="Email address" required />
+            <input id="auth-page-password" type="password" placeholder="Password" required />
+            <button type="submit">Continue</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      const authPageForm = document.getElementById('auth-page-form');
+      const authPageTitle = document.getElementById('auth-page-title');
+      const authPageSubtitle = document.getElementById('auth-page-subtitle');
+      const authPageNameWrap = document.getElementById('auth-page-name-wrap');
+      const authPageButtons = document.querySelectorAll('[data-auth-page-mode]');
+
+      function setAuthPageMode(mode) {
+        const isSignup = mode === 'signup';
+        authPageForm.dataset.mode = mode;
+        authPageTitle.textContent = isSignup ? 'Create your account' : 'Welcome back';
+        authPageSubtitle.textContent = isSignup ? 'Start building your sound library today.' : 'Continue listening to the sound of now.';
+        authPageNameWrap.classList.toggle('hidden', !isSignup);
+        authPageButtons.forEach((button) => button.classList.toggle('active', button.dataset.authPageMode === mode));
+      }
+
+      authPageButtons.forEach((button) => {
+        button.addEventListener('click', () => setAuthPageMode(button.dataset.authPageMode));
+      });
+
+      authPageForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const mode = authPageForm.dataset.mode || 'login';
+        const name = document.getElementById('auth-page-name')?.value || 'Music lover';
+        const email = document.getElementById('auth-page-email').value.trim();
+        const password = document.getElementById('auth-page-password').value.trim();
+        if (!email || !password) return;
+
+        localStorage.setItem('muzmo-user', JSON.stringify({
+          name: mode === 'signup' ? name : (JSON.parse(localStorage.getItem('muzmo-user') || 'null')?.name || 'Music lover'),
+          email,
+          password
+        }));
+
+        window.location.href = 'index.html';
+      });
+    </script>
+  </body>
+</html>
