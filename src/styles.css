@@ -1,0 +1,643 @@
+import { NavLink, Link, Route, Routes, useParams, useNavigate } from 'react-router-dom';
+
+export const tracks = [
+  {
+    id: 'midnight-city',
+    title: 'Midnight City',
+    artist: 'M83',
+    mood: 'Dreamy',
+    duration: '3:48',
+    album: 'Hurry Up, We’re Dreaming',
+    color: '#f4d58d',
+    cover:
+      'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  },
+  {
+    id: 'golden-hour',
+    title: 'Golden Hour',
+    artist: 'JVKE',
+    mood: 'Feel good',
+    duration: '2:59',
+    album: 'Golden Hour',
+    color: '#f5b96d',
+    cover:
+      'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+  },
+  {
+    id: 'ocean-drive',
+    title: 'Ocean Drive',
+    artist: 'Duke Dumont',
+    mood: 'Chill',
+    duration: '4:02',
+    album: 'Ocean Drive',
+    color: '#7bdff2',
+    cover:
+      'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+  },
+  {
+    id: 'sunset-lover',
+    title: 'Sunset Lover',
+    artist: 'Petit Biscuit',
+    mood: 'Dreamy',
+    duration: '3:14',
+    album: 'Sunset Lover',
+    color: '#f7a196',
+    cover:
+      'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+  },
+  {
+    id: 'weightless',
+    title: 'Weightless',
+    artist: 'Marconi Union',
+    mood: 'Focus',
+    duration: '9:07',
+    album: 'Weightless',
+    color: '#8ae3bf',
+    cover:
+      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+  },
+  {
+    id: 'a-walk',
+    title: 'A Walk',
+    artist: 'Tycho',
+    mood: 'Chill',
+    duration: '3:27',
+    album: 'Awake',
+    color: '#b9d1ff',
+    cover:
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+  },
+  {
+    id: 'sunset-dreams',
+    title: 'Sunset Dreams',
+    artist: 'Sundream',
+    mood: 'Feel good',
+    duration: '3:42',
+    album: 'Sunset Dreams',
+    color: '#f7d29e',
+    cover:
+      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+  },
+  {
+    id: 'night-owl',
+    title: 'Night Owl',
+    artist: 'Galimatias',
+    mood: 'Focus',
+    duration: '4:18',
+    album: 'Night Owl',
+    color: '#d0c4ff',
+    cover:
+      'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80',
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+  },
+];
+
+const playlists = [
+  { id: 'afterglow', name: 'Afterglow', type: 'Trending', description: 'Warm synths and smooth vocals for golden-hour evenings.' },
+  { id: 'night-drive', name: 'Night Drive', type: 'Late night', description: 'Shadowy grooves and deep atmospheres for the after-hours. ' },
+  { id: 'clean-flow', name: 'Clean Flow', type: 'Focus', description: 'Minimal textures and airy rhythm for deep work and creative momentum.' },
+];
+
+function App() {
+  const [likedIds, setLikedIds] = useState(() => {
+    const raw = window.localStorage.getItem('muzmo-liked');
+    return raw ? JSON.parse(raw) : [];
+  });
+  const [currentTrackId, setCurrentTrackId] = useState(tracks[0].id);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [search, setSearch] = useState('');
+  const [mood, setMood] = useState('All');
+
+  useEffect(() => {
+    window.localStorage.setItem('muzmo-liked', JSON.stringify(likedIds));
+  }, [likedIds]);
+
+  const currentTrack = tracks.find((track) => track.id === currentTrackId) ?? tracks[0];
+  const likedTracks = tracks.filter((track) => likedIds.includes(track.id));
+
+  const toggleLike = (trackId) => {
+    setLikedIds((current) =>
+      current.includes(trackId)
+        ? current.filter((id) => id !== trackId)
+        : [...current, trackId],
+    );
+  };
+
+  const visibleTracks = tracks.filter((track) => {
+    const matchesMood = mood === 'All' || track.mood === mood;
+    const matchesSearch = `${track.title} ${track.artist} ${track.mood}`
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    return matchesMood && matchesSearch;
+  });
+
+  const handleSelectTrack = (trackId) => {
+    setCurrentTrackId(trackId);
+    setIsPlaying(true);
+  };
+
+  const nextTrack = () => {
+    const idx = tracks.findIndex((track) => track.id === currentTrackId);
+    const next = tracks[(idx + 1) % tracks.length];
+    handleSelectTrack(next.id);
+  };
+
+  const previousTrack = () => {
+    const idx = tracks.findIndex((track) => track.id === currentTrackId);
+    const previous = tracks[(idx - 1 + tracks.length) % tracks.length];
+    handleSelectTrack(previous.id);
+  };
+
+  const pageNav = [
+    { to: '/', label: 'Home', icon: 'house' },
+    { to: '/playlists', label: 'Playlists', icon: 'playlist' },
+    { to: '/library', label: 'Library', icon: 'library' },
+    { to: '/artists', label: 'Artists', icon: 'artists' },
+  ];
+
+  return (
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="brand-wrap">
+          <div className="brand-mark">♪</div>
+          <div className="brand-text">
+            MUZ<span>MO</span>
+          </div>
+        </div>
+
+        <nav className="nav" aria-label="Sidebar navigation">
+          <div className="nav-group">
+            <div className="nav-label">Menu</div>
+            {pageNav.map(({ to, label, icon }) => (
+              <NavLink key={to} to={to} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+                <NavIcon name={icon} />
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
+
+        <div className="side-card">
+          <strong>Fresh picks</strong>
+          <p>Luxury soundtracks for work, late-night drives, and slow mornings.</p>
+          <Link to="/" className="mini-button">Explore picks →</Link>
+        </div>
+      </aside>
+
+      <main className="main-panel">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <DashboardPage
+                search={search}
+                setSearch={setSearch}
+                mood={mood}
+                setMood={setMood}
+                tracks={visibleTracks}
+                onSelectTrack={handleSelectTrack}
+                currentTrack={currentTrack}
+                likedIds={likedIds}
+                toggleLike={toggleLike}
+              />
+            }
+          />
+          <Route
+            path="/album/:trackId"
+            element={<AlbumPage tracks={tracks} likedIds={likedIds} toggleLike={toggleLike} onSelectTrack={handleSelectTrack} />}
+          />
+          <Route
+            path="/playlists"
+            element={<PlaylistsPage tracks={tracks} onSelectTrack={handleSelectTrack} />}
+          />
+          <Route
+            path="/library"
+            element={<LibraryPage tracks={tracks} likedTracks={likedTracks} likedIds={likedIds} toggleLike={toggleLike} onSelectTrack={handleSelectTrack} />}
+          />
+          <Route
+            path="/artists"
+            element={<ArtistsPage tracks={tracks} onSelectTrack={handleSelectTrack} />}
+          />
+        </Routes>
+      </main>
+
+      <footer className="player-bar" aria-label="Music player">
+        <div className="player-track">
+          <img className="player-cover" src={currentTrack.cover} alt={currentTrack.title} />
+          <div className="now-copy">
+            <strong>{currentTrack.title}</strong>
+            <span>{currentTrack.artist}</span>
+          </div>
+        </div>
+
+        <div className="player-controls">
+          <div className="controls-row">
+            <button type="button" className="icon-button" aria-label="Shuffle">
+              <NavIcon name="shuffle" />
+            </button>
+            <button type="button" className="icon-button" aria-label="Previous" onClick={previousTrack}>
+              <NavIcon name="previous" />
+            </button>
+            <button type="button" className="play-main" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={() => setIsPlaying((value) => !value)}>
+              <NavIcon name={isPlaying ? 'pause' : 'play'} />
+            </button>
+            <button type="button" className="icon-button" aria-label="Next" onClick={nextTrack}>
+              <NavIcon name="next" />
+            </button>
+            <button type="button" className="icon-button" aria-label="Repeat">
+              <NavIcon name="repeat" />
+            </button>
+          </div>
+          <div className="timeline">
+            <span>1:12</span>
+            <input type="range" value="42" readOnly />
+            <span>{currentTrack.duration}</span>
+          </div>
+        </div>
+
+        <div className="player-tools">
+          <button type="button" className="icon-button" aria-label="Like track" onClick={() => toggleLike(currentTrack.id)}>
+            <NavIcon name={likedIds.includes(currentTrack.id) ? 'liked' : 'like'} />
+          </button>
+          <button type="button" className="icon-button" aria-label="Volume">
+            <NavIcon name="volume" />
+          </button>
+          <input type="range" value="75" readOnly />
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function DashboardPage({ search, setSearch, mood, setMood, tracks, onSelectTrack, currentTrack, likedIds, toggleLike }) {
+  const moods = ['All', 'Chill', 'Dreamy', 'Feel good', 'Focus'];
+
+  return (
+    <>
+      <header className="topbar">
+        <label className="searchbar" aria-label="Search tracks and artists">
+          <NavIcon name="search" />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            type="search"
+            placeholder="Search tracks, artists, moods"
+          />
+          <span className="shortcut">⌘K</span>
+        </label>
+
+        <div className="top-actions">
+          <button type="button" className="ghost-button">Upgrade</button>
+          <div className="profile-pill">
+            <div className="profile-avatar">M</div>
+            <div className="profile-copy">
+              <strong>Music lover</strong>
+              <span>Good to see you</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section className="hero-panel">
+        <div className="hero-content">
+          <span className="eyebrow">A new sound for every day</span>
+          <h1>Find your kind of rhythm.</h1>
+          <p>Curated playlists, immersive listening, and all the songs that make your day feel premium.</p>
+          <div className="hero-actions">
+            <button type="button" className="primary-button" onClick={() => onSelectTrack(tracks[0]?.id ?? currentTrack.id)}>
+              Start listening
+            </button>
+            <button type="button" className="secondary-button" onClick={() => onSelectTrack(tracks[1]?.id ?? currentTrack.id)}>
+              Play mix
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="content-section" id="discover">
+        <div className="section-head">
+          <div>
+            <h2>Made for your mood</h2>
+            <small>Fresh tracks selected for the moment</small>
+          </div>
+          <button type="button" className="section-link" onClick={() => { setMood('All'); setSearch(''); }}>
+            See all
+          </button>
+        </div>
+
+        <div className="filter-row" aria-label="Mood filters">
+          {moods.map((chip) => (
+            <button
+              type="button"
+              key={chip}
+              className={`filter-chip ${mood === chip ? 'active' : ''}`}
+              onClick={() => setMood(chip)}
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+
+        <div className="track-grid">
+          {tracks.length ? (
+            tracks.map((track) => (
+              <article key={track.id} className="track-card">
+                <div className="cover-wrap">
+                  <img src={track.cover} alt={`${track.title} cover`} />
+                  <button type="button" className="play-badge" aria-label={`Play ${track.title}`} onClick={() => onSelectTrack(track.id)}>
+                    <NavIcon name="play" />
+                  </button>
+                </div>
+                <div className="card-copy">
+                  <div className="card-meta-row">
+                    <h3>{track.title}</h3>
+                    <button type="button" className="tiny-icon" onClick={() => toggleLike(track.id)} aria-label={`Like ${track.title}`}>
+                      <NavIcon name={likedIds.includes(track.id) ? 'liked' : 'like'} />
+                    </button>
+                  </div>
+                  <p>
+                    {track.artist} · {track.mood}
+                  </p>
+                  <Link to={`/album/${track.id}`} className="album-link">Open album</Link>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="empty-note">No tracks match this search yet.</div>
+          )}
+        </div>
+      </section>
+
+      <section className="content-section">
+        <div className="section-head">
+          <div>
+            <h2>Curated playlists</h2>
+            <small>Soundtracks for every moment</small>
+          </div>
+        </div>
+
+        <div className="playlist-grid">
+          {playlists.map((playlist, index) => (
+            <article key={playlist.id} className={`playlist-card playlist-${index + 1}`}>
+              <div className="playlist-tag">{playlist.type}</div>
+              <h3>{playlist.name}</h3>
+              <p>{playlist.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="content-section">
+        <div className="section-head">
+          <div>
+            <h2>Featured artists</h2>
+            <small>New discoveries</small>
+          </div>
+        </div>
+
+        <div className="feature-grid">
+          <div className="spotlight-card">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80" alt="Featured artist portrait" />
+            <div>
+              <span className="eyebrow">Artist spotlight</span>
+              <h3>Omar Vale</h3>
+              <p>Warm textures, layered hooks, and a sound that feels like a quiet neon dusk.</p>
+              <button type="button" className="primary-button" onClick={() => onSelectTrack('sunset-lover')}>
+                Play artist mix
+              </button>
+            </div>
+          </div>
+
+          <div className="artist-list">
+            {[
+              { name: 'Ari Sol', detail: 'Night pop · 32 tracks', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80' },
+              { name: 'Noah Reed', detail: 'Lo-fi soul · 28 tracks', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80' },
+              { name: 'Lina Rue', detail: 'Dreamwave · 21 tracks', image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80' },
+            ].map((artist) => (
+              <article key={artist.name} className="artist-item">
+                <img src={artist.image} alt={artist.name} />
+                <div>
+                  <strong>{artist.name}</strong>
+                  <span>{artist.detail}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function AlbumPage({ tracks, likedIds, toggleLike, onSelectTrack }) {
+  const { trackId } = useParams();
+  const track = tracks.find((item) => item.id === trackId) ?? tracks[0];
+  const relatedTracks = tracks.filter((item) => item.id !== track.id).slice(0, 4);
+
+  return (
+    <section className="album-page">
+      <div className="album-hero">
+        <img src={track.cover} alt={track.title} className="album-cover" />
+        <div className="album-copy">
+          <span className="eyebrow">Album</span>
+          <h1>{track.title}</h1>
+          <p>{track.artist}</p>
+          <div className="album-meta">
+            <span>{track.album}</span>
+            <span>{track.mood}</span>
+            <span>{track.duration}</span>
+          </div>
+          <div className="album-actions">
+            <button type="button" className="primary-button" onClick={() => onSelectTrack(track.id)}>Play album</button>
+            <button type="button" className="secondary-button" onClick={() => toggleLike(track.id)}>
+              {likedIds.includes(track.id) ? 'Saved' : 'Save to library'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="track-list">
+        {tracks.map((item, index) => (
+          <button key={item.id} type="button" className="track-row" onClick={() => onSelectTrack(item.id)}>
+            <span className="track-index">{String(index + 1).padStart(2, '0')}</span>
+            <div className="track-row-main">
+              <strong>{item.title}</strong>
+              <small>{item.artist}</small>
+            </div>
+            <span className="track-row-mood">{item.mood}</span>
+            <span className="track-row-time">{item.duration}</span>
+            <span className="track-row-like">{likedIds.includes(item.id) ? '♥' : '♡'}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="related-wrap">
+        <div className="section-head compact">
+          <div>
+            <h2>More from the collection</h2>
+            <small>You might also like</small>
+          </div>
+        </div>
+        <div className="related-grid">
+          {relatedTracks.map((item) => (
+            <Link key={item.id} to={`/album/${item.id}`} className="related-card">
+              <img src={item.cover} alt={item.title} />
+              <strong>{item.title}</strong>
+              <span>{item.artist}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PlaylistsPage({ tracks, onSelectTrack }) {
+  return (
+    <section className="page-shell">
+      <header className="page-header">
+        <span className="eyebrow">Curated</span>
+        <h1>Playlist collection</h1>
+        <p>Choose the mood, the pace, and the soundtrack for your next moment.</p>
+      </header>
+
+      <div className="playlist-hero">
+        <div className="hero-card hero-card-highlight">
+          <span className="eyebrow">Featured drop</span>
+          <h2>Afterglow</h2>
+          <p>Warm synths, easy grooves, and mellow vocals for the kind of evening that stretches just a bit longer.</p>
+          <button type="button" className="primary-button" onClick={() => onSelectTrack(tracks[0].id)}>Play playlist</button>
+        </div>
+        <div className="hero-card hero-card-alt">
+          <span className="eyebrow">For your focus</span>
+          <h2>Clean Flow</h2>
+          <p>Low-key beats and layered textures for productive afternoons and quiet momentum.</p>
+          <button type="button" className="secondary-button" onClick={() => onSelectTrack(tracks[4].id)}>Start focus mix</button>
+        </div>
+      </div>
+
+      <div className="playlist-layout">
+        {playlists.map((playlist) => (
+          <article key={playlist.id} className="mini-playlist">
+            <div className="playlist-tag">{playlist.type}</div>
+            <h3>{playlist.name}</h3>
+            <p>{playlist.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LibraryPage({ tracks, likedTracks, likedIds, toggleLike, onSelectTrack }) {
+  return (
+    <section className="page-shell">
+      <header className="page-header">
+        <span className="eyebrow">Your collection</span>
+        <h1>Library</h1>
+        <p>Saved songs, favorite playlists, and every sound that keeps finding its way back.</p>
+      </header>
+
+      <section className="liked-section">
+        <div className="section-head compact">
+          <div>
+            <h2>Liked songs</h2>
+            <small>{likedTracks.length} favorite tracks</small>
+          </div>
+        </div>
+
+        <div className="library-grid">
+          {likedTracks.length ? (
+            likedTracks.map((track) => (
+              <article key={track.id} className="library-card">
+                <img src={track.cover} alt={`${track.title} cover`} />
+                <div className="library-copy">
+                  <strong>{track.title}</strong>
+                  <span>{track.artist}</span>
+                </div>
+                <div className="library-actions">
+                  <button type="button" className="tiny-action" onClick={() => onSelectTrack(track.id)}>Play</button>
+                  <button type="button" className="tiny-action alt" onClick={() => toggleLike(track.id)}>Remove</button>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="empty-note library-empty">No liked songs yet. Tap the heart on any track to save it here.</div>
+          )}
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function ArtistsPage({ onSelectTrack }) {
+  const spotlight = {
+    name: 'Omar Vale',
+    description: 'Omar blends soft synth detail, cinematic feeling, and intimate lyrics into a sound that moves from dusty afternoon to electric midnight.',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80',
+  };
+
+  return (
+    <section className="page-shell">
+      <header className="page-header">
+        <span className="eyebrow">Discover</span>
+        <h1>Featured artists</h1>
+        <p>Fresh voices, deep textures, and the sounds you want to keep close.</p>
+      </header>
+
+      <section className="artist-spotlight">
+        <img src={spotlight.image} alt={spotlight.name} />
+        <div>
+          <span className="eyebrow">Artist spotlight</span>
+          <h2>{spotlight.name}</h2>
+          <p>{spotlight.description}</p>
+          <button type="button" className="primary-button" onClick={() => onSelectTrack('sunset-lover')}>Play his mix</button>
+        </div>
+      </section>
+
+      <div className="artist-grid">
+        {[
+          { name: 'Ari Sol', detail: 'Night pop · 32 tracks', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=80' },
+          { name: 'Noah Reed', detail: 'Lo-fi soul · 28 tracks', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80' },
+          { name: 'Lina Rue', detail: 'Dreamwave · 21 tracks', image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=500&q=80' },
+        ].map((artist) => (
+          <article key={artist.name} className="artist-card">
+            <img src={artist.image} alt={artist.name} />
+            <h3>{artist.name}</h3>
+            <p>{artist.detail}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function NavIcon({ name }) {
+  const icons = {
+    house: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9.5Z" /></svg>,
+    playlist: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0-10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm16-2v11a3 3 0 1 1-3-3h10" /></svg>,
+    library: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 18V6m12 12V8M12 18V4" /></svg>,
+    artists: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M16 19v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8 8v-1a4 4 0 0 0-3-3l-1 2" /></svg>,
+    search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 5 5" /></svg>,
+    play: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>,
+    pause: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zm8 0h4v14h-4z" /></svg>,
+    previous: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zm12 1v12l-9-6zm-2 6 7 4.5V6.5z" /></svg>,
+    next: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zm-12 1v12l9-6zm2 6 7 4.5V6.5z" /></svg>,
+    repeat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m17 2 4 4-4 4M7 22l-4-4 4-4M21 6H9a6 6 0 0 0-6 6m0 12h15a6 6 0 0 0 6-6" /></svg>,
+    shuffle: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m17 3 4 4-4 4M3 7h4l5 6h9M3 17h4l5-6h9" /></svg>,
+    like: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z" /></svg>,
+    liked: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.3-10.6-9.5a5.2 5.2 0 0 1 8.6-6.1L12 6l2-1.6a5.2 5.2 0 0 1 8.6 6.1C20.5 15.7 12 21 12 21Z" /></svg>,
+    volume: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M11 5 6 9H3v6h3l5 4V5Zm7 4a5 5 0 0 1 0 6M16 7a9 9 0 0 1 0 10" /></svg>,
+  };
+
+  return <span className="nav-icon">{icons[name] || icons.house}</span>;
+}
+
+export default App;
